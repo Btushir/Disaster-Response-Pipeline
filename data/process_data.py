@@ -2,31 +2,59 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
+
 def load_data(messages_filepath, categories_filepath):
+    """
+    Load the messages and categories dataset
+    Merge the two datasets into one dataframe
+    Params: file paths to messages.csv and categories.csv
+    Return: merged dataframe
+    """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    df = messages.merge(categories, on = "id", how = "inner")
+    df = messages.merge(categories, on="id", how="inner")
     return df
 
+
 def clean_data(df):
-    categories = df["categories"].str.split(";", expand = True)
+    """
+
+    Task:
+    1. Create a "categories" dataframe of 36 categories
+    2. Rename the header of "categories" dataframe
+    3. Convert "categories" dataframe values to 1 and 0
+    4. Drop duplicate rows
+    Params: messages and categories merged dataframe
+    Return: clean dataframe
+    """
+    # Create a dataframe of 36 categories by splitting "categories" column
+    categories = df["categories"].str.split(";", expand=True)
+    # select first row of dataframe categories
     row = categories.iloc[0]
+    # Extract list of new column names for categories
     category_colnames = row.apply(lambda x: x.split("-")[0])
     categories.columns = category_colnames
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].apply(lambda x: x.split("-")[1])
-
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
         categories.related = pd.np.where(categories.related == 2, 1, categories.related)
-        df.drop(columns=["categories" , "original"], inplace=True)
+        # drop the original "categories" and "original" columns from df
+        df.drop(columns=["categories", "original"], inplace=True)
         df = pd.concat([df, categories], axis=1)
+        # drop duplicates
         df = df.drop_duplicates()
         return df
 
+
 def save_data(df, database_filename):
-    engine = create_engine('sqlite:///'+database_filename)
+    """
+    Save the clean and merged dataframe into database
+    Params: database file name
+    Return: None
+    """
+    engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('disaster_response_clean_data_db', engine, index=False, if_exists='replace')
 
 
@@ -41,18 +69,18 @@ def main():
 
         print('Cleaning data...')
         df = clean_data(df)
-        
+
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
         save_data(df, database_filepath)
-        
+
         print('Cleaned data saved to database!')
-    
+
     else:
-        print('Please provide the filepaths of the messages and categories '\
-              'datasets as the first and second argument respectively, as '\
-              'well as the filepath of the database to save the cleaned data '\
-              'to as the third argument. \n\nExample: python process_data.py '\
-              'disaster_messages.csv disaster_categories.csv '\
+        print('Please provide the filepaths of the messages and categories ' \
+              'datasets as the first and second argument respectively, as ' \
+              'well as the filepath of the database to save the cleaned data ' \
+              'to as the third argument. \n\nExample: python process_data.py ' \
+              'disaster_messages.csv disaster_categories.csv ' \
               'DisasterResponse.db')
 
 
