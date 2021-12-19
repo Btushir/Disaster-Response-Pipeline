@@ -1,9 +1,7 @@
 # Disaster Response Pipeline Project
 
 ## Project Overview
-The goal of this project is to classify disaster messages into categories.  
-It utilizes the dataset provided by Figure Eight to build a classifier for a web API. 
-The user inputs the messages through the web API, and results are presented in several categories.
+The goal of this project is to classify disaster messages into categories. It utilizes the dataset provided by Figure Eight to build a classifier for a web API.  The user inputs the messages through the web API, and results are presented in several categories.
 ## Project Components:
 1. ETL pipeline: is implemented in `process_data.py` file
 - It loads the two datasets, namely: messages and categories
