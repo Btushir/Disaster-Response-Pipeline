@@ -37,13 +37,19 @@ def load_data(database_filepath):
 
 def tokenize(text):
     """
-    Params:
-    Return: tokenize text
+    Tokenize the raw messages.
+    Params: text (messages)
+    Return: clean tokenize text
     """
+    # convert all alphabet to lower case
     text = text.lower()
+    # remove punctuation
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
+    # tokenize the text
     text = word_tokenize(text)
+    # remove stop words
     text = [w for w in text if w not in stopwords.words("english")]
+    # perform lemmatization
     text = [WordNetLemmatizer().lemmatize(w, pos='v') for w in text]
     return text
 
@@ -64,13 +70,12 @@ def build_model():
 def evaluate_model(model, X_test, Y_test, category_names):
     """
     Evaluates the model and print the classification report for each
-    Params: trained model, test samples,
+    Params: trained model, test samples and category names
     Return: None
     """
     y_pred = model.predict(X_test)
     # classification report
     print(classification_report(Y_test.values, y_pred, target_names=category_names))
-
     # accuracy score
     accuracy = (y_pred == Y_test.values).mean()
     print('The model accuracy score is {:.3f}'.format(accuracy))
