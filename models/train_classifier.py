@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 import pandas as pd
 import re
 import nltk
-
 nltk.download(['punkt', 'wordnet', 'stopwords'])
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
@@ -17,21 +16,30 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import train_test_split
 import pickle
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV
 
 
 def load_data(database_filepath):
+    """
+    Load the clean and merged dataset of messages and categories from sqlite database
+    Params: Database file path
+    Return: features dataframe, target classes dataframe and category names (or target class names)
+    """
     engine = create_engine('sqlite:///' + database_filepath).connect()
     df = pd.read_sql_table('disaster_response_clean_data_db', engine)
+    # input features
     X = df.iloc[:, 1]
+    # target classes
     Y = df.iloc[:, 4:]
     category_names = Y.columns
     return X, Y, category_names
 
 
 def tokenize(text):
+    """
+    Params:
+    Return: tokenize text
+    """
     text = text.lower()
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
     text = word_tokenize(text)
@@ -41,6 +49,10 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Define a pipeline that includes text processing steps and classifier (random forest).
+    Return: pipeline
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -50,6 +62,11 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Evaluates the model and print the classification report for each
+    Params: trained model, test samples,
+    Return: None
+    """
     y_pred = model.predict(X_test)
     # classification report
     print(classification_report(Y_test.values, y_pred, target_names=category_names))
@@ -60,6 +77,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+    save the trained model as pickel file
+    Params: model: classifier to be saved and model_filepath
+    Return: None
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 

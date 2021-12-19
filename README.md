@@ -1,5 +1,26 @@
 # Disaster Response Pipeline Project
 
+## Project Overview
+The goal of this project is to classify disaster messages into categories.  
+It utilizes the dataset provided by Figure Eight to build a classifier for a web API. 
+The user inputs the messages through the web API, and results are presented in several categories.
+## Project Components:
+1. ETL pipeline: is implemented in `process_data.py` file
+- It loads the two datasets, namely: messages and categories
+- Merge the datasets and clean it
+- Store the cleaned dataset into SQLite database
+
+2. ML pipeline: is implemented in `train_classifier.py` file
+- Load the clean data from the SQLite database 
+- Split the data into train-test sets
+- Build a text processing and ML model
+- Train and evaluate the model
+- Dump the trained model 
+
+3. Web app using Flask: is implemented in `run.py`
+- It provides a platform for user to input a disaster message
+and view the categories as output
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
